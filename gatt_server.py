@@ -256,6 +256,7 @@ class ConfigurationService(Service):
 		Service.__init__(self, bus, index, self.CS_UUID, True)
 		self.add_characteristic(LeerGpioConfigChrc(bus, 0, self))
 		self.add_characteristic(LeerServerConfigChrc(bus, 1, self))
+		self.add_characteristic(EscribirGpioConfigChrc(bus, 2, self))
 		
 class LeerGpioConfigChrc(Characteristic):
     LEER_GPIO_CONFIG_CHARAC_UUID = '00002a38-0000-1000-8000-00805f9b34fb'
@@ -278,11 +279,38 @@ class LeerServerConfigChrc(Characteristic):
 		
     def ReadValue(self, options):
         return stringToDbusByteArray(self.LECTOR.readConfigServer())
-        
+
+class EscribirGpioConfigChrc(Characteristic):
+    ESCRIBIR_GPIO_CONFIG_CHARAC_UUID = '08cf333e-353f-4c82-b0dc-ad2d57d3a018'
+    CONFIG_WRITER = configreadwrite.ConfigReadWrite()
+    ESTADO = 'error'
+
+    def __init__(self, bus, index, service):
+        Characteristic.__init__(
+                self, bus, index,
+                self.ESCRIBIR_GPIO_CONFIG_CHARAC_UUID,
+                ['read','write'],
+                service)
+
+    def WriteValue(self, value, options):
+		print("entro en write value")
+		strValue = busByteArrayToString(value)
+		print("Se recibio: " + strValue)
+		self.ESTADO = self.CONFIG_WRITER.writeConfigGpio(strValue)
+		
+    def ReadValue(self, options):
+        return stringToDbusByteArray(self.ESTADO)
+
 def stringToDbusByteArray(toConvert):
 	result = []
 	for letter in toConvert:
 		result.append(dbus.Byte(letter))
+	return result
+	
+def busByteArrayToString(toConvert):
+	result = ''
+	for letter in toConvert:
+		result += chr(letter)
 	return result
 	
 #~ """

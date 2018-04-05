@@ -8,6 +8,10 @@ class ConfigReadWrite:
 	gpioconfig_path = home + "/indoor-config/gpio.config"
 	serverconfig_path = home + "/indoor-config/server.config"
 	
+	OK = "ok"
+	BAD_REQUEST = "bad_request"
+	ERROR = "error"
+	
 	def readConfigGpio(self):
 		result = {}
 		try:
@@ -43,6 +47,31 @@ class ConfigReadWrite:
 			import traceback
 			print traceback.format_exc()
 		return json.dumps(result)
+		
+	def writeConfigGpio(self, toWrite):
+		try:
+			try:
+				objReq = json.loads(toWrite)
+				if 'tiene_luz' not in objReq or 'tiene_bomba' not in objReq or 'tiene_humytemp' not in objReq or 'tiene_fanintra' not in objReq or 'tiene_fanextra' not in objReq or 'tiene_humtierra' not in objReq or 'tiene_camara' not in objReq:
+					print('le falta algun atributo')
+					return self.BAD_REQUEST 
+			except Exception, parseEx:
+				import traceback
+				print traceback.format_exc()
+				return self.BAD_REQUEST
+			with open(self.gpioconfig_path, "w") as f:
+				f.write('luz=' + str(objReq['tiene_luz']) + '\n')
+				f.write('bomba=' + str(objReq['tiene_bomba']) + '\n')
+				f.write('humytemp=' + str(objReq['tiene_humytemp']) + '\n')
+				f.write('fanintra=' + str(objReq['tiene_fanintra']) + '\n')
+				f.write('fanextra=' + str(objReq['tiene_fanextra']) + '\n')
+				f.write('humtierra=' + str(objReq['tiene_humtierra']) + '\n')
+				f.write('camara=' + str(objReq['tiene_camara']) + '\n')
+		except Exception, ex:
+			import traceback
+			print traceback.format_exc()
+			return self.ERROR
+		return self.OK
 	
 	def readConfigServer(self):
 		result = {}
