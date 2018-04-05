@@ -98,3 +98,25 @@ class ConfigReadWrite:
 			import traceback
 			print traceback.format_exc()
 		return json.dumps(result)
+		
+	def writeConfigServer(self, toWrite):
+		try:
+			try:
+				objReq = json.loads(toWrite)
+				if 'queueUrl' not in objReq or 'queueName' not in objReq or 'queueUser' not in objReq or 'queuePassword' not in objReq:
+					print('le falta algun atributo')
+					return self.BAD_REQUEST 
+			except Exception, parseEx:
+				import traceback
+				print traceback.format_exc()
+				return self.BAD_REQUEST
+			with open(self.serverconfig_path, "w") as f:
+				f.write('queueUrl=' + objReq['queueUrl'] + '\n')
+				f.write('queueName=' + objReq['queueName'] + '\n')
+				f.write('queueUser=' + objReq['queueUser'] + '\n')
+				f.write('queuePassword=' + objReq['queuePassword'] + '\n')
+		except Exception, ex:
+			import traceback
+			print traceback.format_exc()
+			return self.ERROR
+		return self.OK
