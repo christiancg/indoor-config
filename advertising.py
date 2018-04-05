@@ -95,9 +95,10 @@ class TestAdvertisement(Advertisement):
         Advertisement.__init__(self, bus, index, 'peripheral')
         #~ self.add_service_uuid('180D')
         #~ self.add_service_uuid('180F')
+        self.add_service_uuid('b5fd')
         self.add_manufacturer_data(0xffff, [0x00, 0x01, 0x02, 0x03, 0x04])
         self.add_service_data('9999', [0x00, 0x01, 0x02, 0x03, 0x04])
-        self.add_service_uuid('1266b5fd-b35d-4337-bd61-e2159dfa6633')
+        #~ self.add_service_uuid('1266b5fd-b35d-4337-bd61-e2159dfa6633')
         self.include_tx_power = True
 
 
