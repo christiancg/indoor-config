@@ -9,6 +9,7 @@ import array
 import functools
 
 import configreadwrite
+import startstoprestart
 
 try:
   from gi.repository import GObject
@@ -48,6 +49,7 @@ class Application(dbus.service.Object):
         #~ self.add_service(TestService(bus, 2))
         #~ self.add_service(ConfigurationService(bus,3))
         self.add_service(ConfigurationService(bus,0))
+        self.add_service(StartStopRestartService(bus,1))
 
     def get_path(self):
         return dbus.ObjectPath(self.path)
@@ -309,6 +311,34 @@ class EscribirServerConfigChrc(Characteristic):
     def WriteValue(self, value, options):
 		strValue = busByteArrayToString(value)
 		self.ESTADO = self.CONFIG_WRITER.writeConfigServer(strValue)
+    
+    def ReadValue(self, options):
+        return stringToDbusByteArray(self.ESTADO)
+        
+class StartStopRestartService(Service):
+	SSR_UUID = '45b3dfe8-e976-4928-b671-b11754553d5b'
+	
+	def __init__(self, bus, index):
+		Service.__init__(self, bus, index, self.SSR_UUID, True)
+		self.add_characteristic(StartStopRestartChrc(bus, 0, self))
+		
+class StartStopRestartChrc(Characteristic):
+    START_STOP_RESTART_SERVER_CHARAC_UUID = '00fa5ebb-5093-44cb-b251-cb35c59ded7a'
+    WORKER = startstoprestart.StartStopRestart()
+    ESTADO = 'error'
+
+    def __init__(self, bus, index, service):
+        Characteristic.__init__(self, bus, index,self.START_STOP_RESTART_SERVER_CHARAC_UUID,['read','write'],service)
+    
+    def WriteValue(self, value, options):
+	    try:
+		    strValue = busByteArrayToString(value)
+		    intValue = int(strValue)
+		    self.ESTADO = self.WORKER.process(intValue)
+	    except Exception, ex:
+		    import traceback
+		    print(traceback.format_exc())
+		    self.ESTADO = self.WORKER.BAD_REQUEST
     
     def ReadValue(self, options):
         return stringToDbusByteArray(self.ESTADO)
