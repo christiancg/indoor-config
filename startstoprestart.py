@@ -17,10 +17,13 @@ class StartStopRestart:
 			return self.BAD_REQUEST 
 
 	def _startServer(self):
+		subprocess.call(['sudo', 'service', 'indoor', 'start'])
 		return self.OK
 		
 	def _stopServer(self):
+		subprocess.call(['sudo', 'service', 'indoor', 'stop'])
 		return self.OK
 		
 	def _restartServer(self):
+		subprocess.call(['sudo', 'service', 'indoor', 'restart'])
 		return self.OK
