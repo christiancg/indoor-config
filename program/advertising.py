@@ -89,6 +89,9 @@ class Advertisement(dbus.service.Object):
     def Release(self):
         print('%s: Released!' % self.path)
 
+	def __del__(self):
+		self.remove_from_connection()
+
 
 class TestAdvertisement(Advertisement):
     def __init__(self, bus, index):
@@ -97,6 +100,7 @@ class TestAdvertisement(Advertisement):
         #~ self.add_service_uuid('180F')
         self.add_service_uuid('b5fd')
         self.add_service_uuid('dfe8')
+        self.add_service_uuid('8ce1')
         self.add_manufacturer_data(0xffff, [0x00, 0x01, 0x02, 0x03, 0x04])
         self.add_service_data('9999', [0x00, 0x01, 0x02, 0x03, 0x04])
         #~ self.add_service_uuid('1266b5fd-b35d-4337-bd61-e2159dfa6633')

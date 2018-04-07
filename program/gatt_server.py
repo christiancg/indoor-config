@@ -10,6 +10,7 @@ import functools
 
 import configreadwrite
 import startstoprestart
+import wlanconfig
 
 try:
   from gi.repository import GObject
@@ -50,6 +51,7 @@ class Application(dbus.service.Object):
         #~ self.add_service(ConfigurationService(bus,3))
         self.add_service(ConfigurationService(bus,0))
         self.add_service(StartStopRestartService(bus,1))
+        self.add_service(WlanConfigService(bus,2))
 
     def get_path(self):
         return dbus.ObjectPath(self.path)
@@ -72,6 +74,9 @@ class Application(dbus.service.Object):
                     response[desc.get_path()] = desc.get_properties()
 
         return response
+        
+	def __del__(self):
+		self.remove_from_connection()
 
 
 class Service(dbus.service.Object):
@@ -342,6 +347,26 @@ class StartStopRestartChrc(Characteristic):
     
     def ReadValue(self, options):
         return stringToDbusByteArray(self.ESTADO)
+        
+class WlanConfigService(Service):
+	WC_UUID = '2c238ce1-3911-4f28-9b14-07c838d4484d'
+	
+	def __init__(self, bus, index):
+		Service.__init__(self, bus, index, self.WC_UUID, True)
+		self.add_characteristic(WlanScanChrc(bus, 0, self))
+		
+class WlanScanChrc(Characteristic):
+	SCAN_CHARAC_UUID = 'bed8a9ea-9abe-45e1-803f-3f5df41b49fb'
+	WLAN = wlanconfig.WlanConfig()
+	
+	def __init__(self, bus, index, service):
+		Characteristic.__init__(self, bus, index,self.SCAN_CHARAC_UUID,['read'],service)
+		
+	def ReadValue(self, options):
+		result = self.WLAN.scanNetworks()
+		if result is None:
+			result = 'error'
+		return stringToDbusByteArray(result)
 
 def stringToDbusByteArray(toConvert):
 	result = []
