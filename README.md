@@ -12,7 +12,7 @@ tar xf bluez-5.49.tar.xz
 
 cd bluez-5.49
 
-./configure
+./configure --prefix=/usr --mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var 
 
 make
 
