@@ -7,7 +7,7 @@ class WlanConfig:
 		try:
 			p = subprocess.Popen(["sudo", "iwlist", "wlan0", "scan"], stdout=subprocess.PIPE)
 			output, error = p.communicate()
-			if error != None:
+			if error == None:
 				result = []
 				items = output.split("Cell")
 				for item in items:
@@ -17,6 +17,7 @@ class WlanConfig:
 					result.append(strSSID)
 				return json.dumps(result)
 			else:
+				print('Salio con error al buscar redes wifi')
 				return None
 		except Exception, ex:
 			import traceback
