@@ -18,6 +18,17 @@ make
 
 sudo make install
 
+### Esto ya instalo la nueva version, pero hay que hacer que el SO apunte a la misma
+sudo vim /lib/systemd/system/bluetooth.service
+
+Make sure the exec.start line points to your new daemon in /usr/libexec/bluetooth
+
+sudo mv /usr/lib/bluetooth/bluetoothd /usr/lib/bluetooth/bluetoothd-543.orig
+
+sudo ln -s /usr/libexec/bluetooth/bluetoothd /usr/lib/bluetooth/bluetoothd
+
+sudo systemctl daemon-reload
+
 ## Instalacion de librerias para soporte de bluetooth en python
 sudo apt-get update
 
