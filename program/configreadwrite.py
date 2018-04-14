@@ -1,14 +1,16 @@
 import json
 from distutils import util
 
-from os.path import expanduser
-home = expanduser("~")
+#~ from os.path import expanduser
+#~ home = expanduser("~")
 
 class ConfigReadWrite:
-	gpioconfig_path = home + "/indoor-config/gpio.config"
-	serverconfig_path = home + "/indoor-config/server.config"
+	gpioconfig_path = "/home/pi/indoor-config/gpio.config"
+	serverconfig_path = "/home/pi/indoor-config/server.config"
+	hostname_path = "/etc/machine-info"
 	
 	OK = "ok"
+	HARD_RESET = "requires_hard_reset"
 	BAD_REQUEST = "bad_request"
 	ERROR = "error"
 	
@@ -30,19 +32,19 @@ class ConfigReadWrite:
 									boolvalor = False
 								print parametro + ' ' + valor
 								if parametro == 'luz':
-									result['tiene_luz']=boolvalor
+									result['luz']=boolvalor
 								elif parametro == 'bomba':
-									result['tiene_bomba']=boolvalor
+									result['bomba']=boolvalor
 								elif parametro == 'humytemp':
-									result['tiene_humytemp']=boolvalor
+									result['humytemp']=boolvalor
 								elif parametro == 'fanintra':
-									result['tiene_fanintra']=boolvalor
+									result['fanintra']=boolvalor
 								elif parametro == 'fanextra':
-									result['tiene_fanextra']=boolvalor
+									result['fanextra']=boolvalor
 								elif parametro == 'humtierra':
-									result['tiene_humtierra']=boolvalor
+									result['humtierra']=boolvalor
 								elif parametro == 'camara':
-									result['tiene_camara']=boolvalor
+									result['camara']=boolvalor
 		except Exception, ex:
 			import traceback
 			print traceback.format_exc()
@@ -52,7 +54,7 @@ class ConfigReadWrite:
 		try:
 			try:
 				objReq = json.loads(toWrite)
-				if 'tiene_luz' not in objReq or 'tiene_bomba' not in objReq or 'tiene_humytemp' not in objReq or 'tiene_fanintra' not in objReq or 'tiene_fanextra' not in objReq or 'tiene_humtierra' not in objReq or 'tiene_camara' not in objReq:
+				if 'luz' not in objReq or 'bomba' not in objReq or 'humytemp' not in objReq or 'fanintra' not in objReq or 'fanextra' not in objReq or 'humtierra' not in objReq or 'camara' not in objReq:
 					print('le falta algun atributo')
 					return self.BAD_REQUEST 
 			except Exception, parseEx:
@@ -60,13 +62,13 @@ class ConfigReadWrite:
 				print traceback.format_exc()
 				return self.BAD_REQUEST
 			with open(self.gpioconfig_path, "w") as f:
-				f.write('luz=' + str(objReq['tiene_luz']) + '\n')
-				f.write('bomba=' + str(objReq['tiene_bomba']) + '\n')
-				f.write('humytemp=' + str(objReq['tiene_humytemp']) + '\n')
-				f.write('fanintra=' + str(objReq['tiene_fanintra']) + '\n')
-				f.write('fanextra=' + str(objReq['tiene_fanextra']) + '\n')
-				f.write('humtierra=' + str(objReq['tiene_humtierra']) + '\n')
-				f.write('camara=' + str(objReq['tiene_camara']) + '\n')
+				f.write('luz=' + str(objReq['luz']) + '\n')
+				f.write('bomba=' + str(objReq['bomba']) + '\n')
+				f.write('humytemp=' + str(objReq['humytemp']) + '\n')
+				f.write('fanintra=' + str(objReq['fanintra']) + '\n')
+				f.write('fanextra=' + str(objReq['fanextra']) + '\n')
+				f.write('humtierra=' + str(objReq['humtierra']) + '\n')
+				f.write('camara=' + str(objReq['camara']) + '\n')
 		except Exception, ex:
 			import traceback
 			print traceback.format_exc()
@@ -100,7 +102,9 @@ class ConfigReadWrite:
 		return json.dumps(result)
 		
 	def writeConfigServer(self, toWrite):
+		result = None
 		try:
+			old_indoor_name = ''
 			try:
 				objReq = json.loads(toWrite)
 				if 'queueUrl' not in objReq or 'queueName' not in objReq or 'queueUser' not in objReq or 'queuePassword' not in objReq:
@@ -110,13 +114,29 @@ class ConfigReadWrite:
 				import traceback
 				print traceback.format_exc()
 				return self.BAD_REQUEST
+			
+			result = self.OK
 			with open(self.serverconfig_path, "w") as f:
 				f.write('queueUrl=' + objReq['queueUrl'] + '\n')
 				f.write('queueName=' + objReq['queueName'] + '\n')
 				f.write('queueUser=' + objReq['queueUser'] + '\n')
 				f.write('queuePassword=' + objReq['queuePassword'] + '\n')
+			
+			with open(self.hostname_path, 'r+w') as f:
+				for line in f:
+					if line:
+						if 'PRETTY_HOSTNAME=' in line:
+							index = line.find('=')
+							if index > 0:
+								old_indoor_name = line[index+1:].rstrip()
+								if old_indoor_name != objReq['queueName']:
+									f.seek(0)
+									newLine = 'PRETTY_HOSTNAME=' + objReq['queueName']
+									f.write(newLine)
+									f.truncate()
+									result = self.HARD_RESET
 		except Exception, ex:
 			import traceback
 			print traceback.format_exc()
 			return self.ERROR
-		return self.OK
+		return result
