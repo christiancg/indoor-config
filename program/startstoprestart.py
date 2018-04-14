@@ -13,6 +13,8 @@ class StartStopRestart:
 			return self._stopServer()
 		elif todo == 3:
 			return self._restartServer()
+		elif todo == 4:
+			return self._hardRestartServer()
 		else:
 			return self.BAD_REQUEST 
 
@@ -26,4 +28,8 @@ class StartStopRestart:
 		
 	def _restartServer(self):
 		subprocess.call(['sudo', 'service', 'indoor', 'restart'])
+		return self.OK
+		
+	def _hardRestartServer(self):
+		subprocess.call(['sudo', 'reboot'])
 		return self.OK

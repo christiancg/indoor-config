@@ -1,0 +1,11 @@
+[unit]
+Description=Indoor service
+After=multi-user.target
+ 
+[Service]
+Type=simple
+ExecStart=/bin/su - pi -c '/usr/bin/python /home/pi/indoor/run.py'
+Restart=on-abort
+ 
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,11 @@
+[unit]
+Description=Indoor config service
+After=bluetooth.target multi-user.target
+ 
+[Service]
+Type=idle
+ExecStart=/bin/su - pi -c '/usr/bin/python /home/pi/indoor-config/program/run.py'
+Restart=on-abort
+ 
+[Install]
+WantedBy=multi-user.target
