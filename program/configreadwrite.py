@@ -7,6 +7,7 @@ from distutils import util
 class ConfigReadWrite:
 	gpioconfig_path = "/home/pi/indoor-config/gpio.config"
 	serverconfig_path = "/home/pi/indoor-config/server.config"
+	userconfig_path = "/home/pi/indoor-config/user.config"
 	hostname_path = "/etc/machine-info"
 	
 	OK = "ok"
@@ -135,6 +136,45 @@ class ConfigReadWrite:
 									f.write(newLine)
 									f.truncate()
 									result = self.HARD_RESET
+		except Exception, ex:
+			import traceback
+			print traceback.format_exc()
+			return self.ERROR
+		return result
+		
+	def readConfigUser(self):
+		result = {}
+		try:
+			with open(self.userconfig_path) as f:
+				for line in f:
+					if line:
+						if '=' in line:
+							index = line.find('=')
+							if index > 0:
+								parametro = line[0:index]
+								valor = line[index+1:].rstrip()
+								result[parametro] = valor
+		except Exception, ex:
+			import traceback
+			print traceback.format_exc()
+		return json.dumps(result)
+		
+	def writeConfigUser(self, toWrite):
+		result = None
+		try:
+			try:
+				objReq = json.loads(toWrite)
+				if not objReq:
+					print('No hay ningun usuario para escribir')
+					return self.BAD_REQUEST 
+			except Exception, parseEx:
+				import traceback
+				print traceback.format_exc()
+				return self.BAD_REQUEST
+			with open(self.userconfig_path, "w") as f:
+				for key in objReq:
+					f.write(key + '=' + objReq[key] + '\n')
+			result = self.OK
 		except Exception, ex:
 			import traceback
 			print traceback.format_exc()
