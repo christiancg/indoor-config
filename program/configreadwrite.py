@@ -142,7 +142,7 @@ class ConfigReadWrite:
 			return self.ERROR
 		return result
 		
-	def readConfigUser(self):
+	def readConfigUsers(self):
 		result = {}
 		try:
 			with open(self.userconfig_path) as f:
@@ -159,7 +159,7 @@ class ConfigReadWrite:
 			print traceback.format_exc()
 		return json.dumps(result)
 		
-	def writeConfigUser(self, toWrite):
+	def writeConfigUsers(self, toWrite):
 		result = None
 		try:
 			try:

@@ -262,9 +262,11 @@ class ConfigurationService(Service):
 	def __init__(self, bus, index):
 		Service.__init__(self, bus, index, self.CS_UUID, True)
 		self.add_characteristic(LeerGpioConfigChrc(bus, 0, self))
-		self.add_characteristic(LeerServerConfigChrc(bus, 1, self))
-		self.add_characteristic(EscribirGpioConfigChrc(bus, 2, self))
+		self.add_characteristic(EscribirGpioConfigChrc(bus, 1, self))
+		self.add_characteristic(LeerServerConfigChrc(bus, 2, self))
 		self.add_characteristic(EscribirServerConfigChrc(bus, 3, self))
+		self.add_characteristic(LeerUsersConfigChrc(bus, 4, self))
+		self.add_characteristic(EscribirUsersConfigChrc(bus, 5, self))
 		
 class LeerGpioConfigChrc(Characteristic):
     LEER_GPIO_CONFIG_CHARAC_UUID = '00002a38-0000-1000-8000-00805f9b34fb'
@@ -285,6 +287,16 @@ class LeerServerConfigChrc(Characteristic):
 		
     def ReadValue(self, options):
         return stringToDbusByteArray(self.LECTOR.readConfigServer())
+        
+class LeerUsersConfigChrc(Characteristic):
+    LEER_USERS_CONFIG_CHARAC_UUID = '211ae4c5-7df9-4361-9712-f72ee77a7e9b'
+    LECTOR = configreadwrite.ConfigReadWrite()
+
+    def __init__(self, bus, index, service):
+        Characteristic.__init__(self, bus, index,self.LEER_USERS_CONFIG_CHARAC_UUID,['read'],service)
+		
+    def ReadValue(self, options):
+        return stringToDbusByteArray(self.LECTOR.readConfigUsers())
 
 class EscribirGpioConfigChrc(Characteristic):
     ESCRIBIR_GPIO_CONFIG_CHARAC_UUID = '08cf333e-353f-4c82-b0dc-ad2d57d3a018'
@@ -316,6 +328,21 @@ class EscribirServerConfigChrc(Characteristic):
     def WriteValue(self, value, options):
 		strValue = busByteArrayToString(value)
 		self.ESTADO = self.CONFIG_WRITER.writeConfigServer(strValue)
+    
+    def ReadValue(self, options):
+        return stringToDbusByteArray(self.ESTADO)
+        
+class EscribirUsersConfigChrc(Characteristic):
+    ESCRIBIR_USER_CONFIG_CHARAC_UUID = 'a5b1e27c-a685-41ce-98e2-e361cd122bde'
+    CONFIG_WRITER = configreadwrite.ConfigReadWrite()
+    ESTADO = 'error'
+
+    def __init__(self, bus, index, service):
+        Characteristic.__init__(self, bus, index,self.ESCRIBIR_USER_CONFIG_CHARAC_UUID,['read','write'],service)
+    
+    def WriteValue(self, value, options):
+		strValue = busByteArrayToString(value)
+		self.ESTADO = self.CONFIG_WRITER.writeConfigUsers(strValue)
     
     def ReadValue(self, options):
         return stringToDbusByteArray(self.ESTADO)
