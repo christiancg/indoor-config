@@ -7,7 +7,7 @@ from distutils import util
 class ConfigReadWrite:
 	gpioconfig_path = "/home/pi/indoor-config/gpio.config"
 	serverconfig_path = "/home/pi/indoor-config/server.config"
-	userconfig_path = "/home/pi/indoor-config/user.config"
+	userconfig_path = "/home/pi/indoor-config/users.config"
 	hostname_path = "/etc/machine-info"
 	
 	OK = "ok"
