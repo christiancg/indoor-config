@@ -117,9 +117,11 @@ class ConfigReadWrite:
 				return self.BAD_REQUEST
 			
 			result = self.OK
+			nombre = ''
 			with open(self.serverconfig_path, "w") as f:
+				nombre = 'indoor-' + objReq['queueName']
+				f.write('queueName=' + nombre + '\n')
 				f.write('queueUrl=' + objReq['queueUrl'] + '\n')
-				f.write('queueName=' + objReq['queueName'] + '\n')
 				f.write('queueUser=' + objReq['queueUser'] + '\n')
 				f.write('queuePassword=' + objReq['queuePassword'] + '\n')
 			
@@ -130,9 +132,9 @@ class ConfigReadWrite:
 							index = line.find('=')
 							if index > 0:
 								old_indoor_name = line[index+1:].rstrip()
-								if old_indoor_name != objReq['queueName']:
+								if old_indoor_name != nombre:
 									f.seek(0)
-									newLine = 'PRETTY_HOSTNAME=' + objReq['queueName']
+									newLine = 'PRETTY_HOSTNAME=' + nombre
 									f.write(newLine)
 									f.truncate()
 									result = self.HARD_RESET
