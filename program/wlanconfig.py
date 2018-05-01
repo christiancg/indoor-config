@@ -5,6 +5,10 @@ class WlanConfig:
 	
 	wpasupplicant_path = "/etc/wpa_supplicant/wpa_supplicant.conf"
 	
+	OK = "ok"
+	BAD_REQUEST = "bad_request"
+	ERROR = "error"
+	
 	def scanNetworks(self):
 		try:
 			p = subprocess.Popen(["sudo", "iwlist", "wlan0", "scan"], stdout=subprocess.PIPE)
@@ -33,18 +37,27 @@ class WlanConfig:
 			print traceback.format_exc()
 			return None
 
-	def writeWifiPossibility(self, ssid, password):
+	def writeWifiPossibility(self, strObj):
+		objReq = None
 		try:
-			with open(self.wpasupplicant_path, "a") as f:
-				f.write('\nnetwork={\n')
-				f.write('         ssid="' + ssid + '"\n')
-				f.write('         psk="' + password + '"\n')
-				f.write('}\n')
-			return True
+			objReq = json.loads(strObj)
+			if 'ssid' not in objReq or 'password' not in objReq:
+				return self.BAD_REQUEST
 		except Exception:
 			import traceback
 			print traceback.format_exc()
-			return False
+			return self.BAD_REQUEST
+		try:
+			with open(self.wpasupplicant_path, "a") as f:
+				f.write('\nnetwork={\n')
+				f.write('         ssid="' + objReq['ssid'] + '"\n')
+				f.write('         psk="' + objReq['password'] + '"\n')
+				f.write('}\n')
+			return self.OK
+		except Exception:
+			import traceback
+			print traceback.format_exc()
+			return self.ERROR
 			
 	def getConnectedNetwork(self):
 		try:
