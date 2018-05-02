@@ -377,6 +377,8 @@ class WlanConfigService(Service):
 	def __init__(self, bus, index):
 		Service.__init__(self, bus, index, self.WC_UUID, True)
 		self.add_characteristic(WlanScanChrc(bus, 0, self))
+		self.add_characteristic(WlanGetConnectedChrc(bus, 1, self))
+		self.add_characteristic(WlanConnectChrc(bus, 2, self))
 		
 class WlanScanChrc(Characteristic):
 	SCAN_CHARAC_UUID = 'bed8a9ea-9abe-45e1-803f-3f5df41b49fb'
@@ -387,6 +389,19 @@ class WlanScanChrc(Characteristic):
 		
 	def ReadValue(self, options):
 		result = self.WLAN.scanNetworks()
+		if result is None:
+			result = 'error'
+		return stringToDbusByteArray(result)
+		
+class WlanGetConnectedChrc(Characteristic):
+	GET_CONNECTED_CHARAC_UUID = '26e260af-d8f3-42cf-b48e-385eb5af5a9f'
+	WLAN = wlanconfig.WlanConfig()
+	
+	def __init__(self, bus, index, service):
+		Characteristic.__init__(self, bus, index,self.GET_CONNECTED_CHARAC_UUID,['read'],service)
+		
+	def ReadValue(self, options):
+		result = self.WLAN.getConnectedNetwork()
 		if result is None:
 			result = 'error'
 		return stringToDbusByteArray(result)
@@ -410,19 +425,6 @@ class WlanConnectChrc(Characteristic):
 		
 	def ReadValue(self, options):
 		return stringToDbusByteArray(self.ESTADO)
-		
-class WlanGetConnectedChrc(Characteristic):
-	GET_CONNECTED_CHARAC_UUID = '26e260af-d8f3-42cf-b48e-385eb5af5a9f'
-	WLAN = wlanconfig.WlanConfig()
-	
-	def __init__(self, bus, index, service):
-		Characteristic.__init__(self, bus, index,self.GET_CONNECTED_CHARAC_UUID,['read'],service)
-		
-	def ReadValue(self, options):
-		result = self.WLAN.getConnectedNetwork()
-		if result is None:
-			result = 'error'
-		return stringToDbusByteArray(result)
 
 def stringToDbusByteArray(toConvert):
 	result = []

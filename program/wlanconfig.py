@@ -11,7 +11,7 @@ class WlanConfig:
 	
 	def scanNetworks(self):
 		try:
-			p = subprocess.Popen(["sudo", "iwlist", "wlan0", "scan"], stdout=subprocess.PIPE)
+			p = subprocess.Popen(["iwlist", "wlan0", "scan"], stdout=subprocess.PIPE)
 			output, error = p.communicate()
 			if error == None:
 				result = []
@@ -26,7 +26,7 @@ class WlanConfig:
 						idxEnd = item.index('"',idxStart)
 						strSSID = item[idxStart:idxEnd]
 						isSecure = ("PSK" in item)
-						auxResult = { "ssid": strSSID, "secure": isSecure } 
+						auxResult = { "ssid": strSSID, "secure": isSecure }
 						result.append(auxResult)
 				return json.dumps(result)
 			else:
@@ -66,8 +66,8 @@ class WlanConfig:
 			if error == None:
 				connectedSsid = ""
 				if "ESSID:" in output:
-					idxStart = item.index("ESSID:") + 1
-					connectedSsid = item[idxStart:-1]
+					idxStart = output.index("ESSID:") + 7
+					connectedSsid = output[idxStart:-2]
 				return connectedSsid
 			else:
 				return "error"
