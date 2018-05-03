@@ -4,7 +4,8 @@ After=bluetooth.target multi-user.target
  
 [Service]
 Type=idle
-ExecStart=/bin/su - pi -c '/usr/bin/python /home/pi/indoor-config/program/run.py'
+#ExecStart=/bin/su - pi -c '/usr/bin/python /home/pi/indoor-config/program/run.py'
+ExecStart=/usr/bin/python /home/pi/indoor-config/program/run.py
 Restart=on-abort
  
 [Install]
