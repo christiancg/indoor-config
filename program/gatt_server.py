@@ -348,7 +348,19 @@ class StartStopRestartService(Service):
 	
 	def __init__(self, bus, index):
 		Service.__init__(self, bus, index, self.SSR_UUID, True)
-		self.add_characteristic(StartStopRestartChrc(bus, 0, self))
+		self.add_characteristic(ServerStatusChrc(bus, 0, self))
+		self.add_characteristic(StartStopRestartChrc(bus, 1, self))
+		
+class ServerStatusChrc(Characteristic):
+	SERVER_STATUS_CHARAC_UUID = 'a9d7f22f-5ab4-4d0e-8487-0f5cc6b29bcc'
+	READER = startstoprestart.StartStopRestart()
+	
+	def __init__(self, bus, index, service):
+		Characteristic.__init__(self, bus, index,self.SERVER_STATUS_CHARAC_UUID,['read'],service)
+		
+	def ReadValue(self, options):
+		result = self.READER.isServiceRunning()
+		return stringToDbusByteArray(str(result))
 		
 class StartStopRestartChrc(Characteristic):
     START_STOP_RESTART_SERVER_CHARAC_UUID = '00fa5ebb-5093-44cb-b251-cb35c59ded7a'

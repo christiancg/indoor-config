@@ -1,5 +1,5 @@
 import subprocess
-
+import os
 
 class StartStopRestart:	
 	OK = "ok"
@@ -33,3 +33,12 @@ class StartStopRestart:
 	def _hardRestartServer(self):
 		subprocess.call(['sudo', 'reboot'])
 		return self.OK
+
+	def isServiceRunning(self):
+		try:
+			with open(os.devnull, 'wb') as hide_output:
+				exit_code = subprocess.Popen(['service', 'indoor', 'status'], stdout=hide_output, stderr=hide_output).wait()
+				return exit_code == 0
+		except Exception, ex:
+			print('Salio por excepcion: ' + ex)
+			return 'error'
