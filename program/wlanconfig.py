@@ -37,16 +37,17 @@ class WlanConfig:
 			#~ else:
 				#~ print('Salio con error al buscar redes wifi')
 				#~ return None
-			result = []
+			result = ''
 			networks = Cell.all('wlan0')
 			for item in networks:
 				auxSecurity = None
 				if item.encrypted:
 					auxSecurity = item.encryption_type
-				auxResult = { "ssid": item.ssid, "security_type": auxSecurity }
-				result.append(auxResult)
-			print(json.dumps(result))
-			return json.dumps(result)
+				result = result +  item.ssid + '-' + auxSecurity
+				if (networks.index(item) + 1) != len(networks):
+					result = result + '|'
+			print(result)
+			return result
 		except Exception, ex:
 			import traceback
 			print traceback.format_exc()
