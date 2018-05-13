@@ -46,8 +46,7 @@ class WlanConfig:
 				result = result +  item.ssid + '-' + auxSecurity
 				if (networks.index(item) + 1) != len(networks):
 					result = result + '|'
-			print(result)
-			return result
+			return str(result)
 		except Exception, ex:
 			import traceback
 			print traceback.format_exc()
