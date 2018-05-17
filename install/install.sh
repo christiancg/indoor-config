@@ -33,6 +33,6 @@ sudo sed -i -e 's/ExecStart=\/usr\/lib\/bluetooth\/bluetoothd/ExecStart=\/usr\/l
 sudo sdptool add SP
 # Actualizar todos los paquetes instalados y reiniciar
 sudo apt-get update
-sudo apt-get upgrade
+sudo apt-get -y upgrade
 sudo rpi-update
 sudo reboot now
