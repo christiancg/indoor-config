@@ -11,6 +11,7 @@ sudo cp /home/pi/indoor-config/startup-scripts/indoor.service /lib/systemd/syste
 sudo systemctl daemon-reload
 sudo systemctl enable indoor.service
 sudo systemctl enable indoor-config.service
+sudo systemctl enable pigpiod.service
 # Se instala la base de datos sqlite
 sudo apt-get install -y sqlite
 # Se instalan dependencias de python
