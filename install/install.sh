@@ -19,7 +19,7 @@ wget http://www.kernel.org/pub/linux/bluetooth/bluez-5.49.tar.xz
 tar xf bluez-5.49.tar.xz
 cd bluez-5.49
 ./configure --prefix=/usr --mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var
-makudo 
+make
 sudo make install
 sudo mv /usr/lib/bluetooth/bluetoothd /usr/lib/bluetooth/bluetoothd-543.orig
 sudo ln -s /usr/libexec/bluetooth/bluetoothd /usr/lib/bluetooth/bluetoothd
