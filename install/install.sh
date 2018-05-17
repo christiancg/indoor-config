@@ -1,4 +1,8 @@
-# Primero se descarga el repositorio que falta
+# Primero genera carpetas y archivos que faltan
+mkdir /home/pi/indoor-config/db
+touch /home/pi/indoor-config/db/indoor.db
+mkdir /home/pi/indoor-config/images
+# Se descarga el repositorio que falta
 cd /home/pi
 git clone https://github.com/christiancg/indoor.git
 # Se copian y habilitan los servicios (se inician mas adelante, faltan dependencias)
@@ -7,6 +11,8 @@ sudo cp /home/pi/indoor-config/startup-scripts/indoor.service /lib/systemd/syste
 sudo systemctl daemon-reload
 sudo systemctl enable indoor.service
 sudo systemctl enable indoor-config.service
+# Se instala la base de datos sqlite
+sudo apt-get install -y sqlite
 # Se instalan dependencias de python
 sudo pip install flask_sqlalchemy
 sudo pip install pika
@@ -28,7 +34,8 @@ sudo systemctl daemon-reload
 sudo apt-get install -y libbluetooth-dev bluez bluez-hcidump libboost-python-dev libboost-thread-dev libglib2.0-dev bluetooth libbluetooth-dev python-pip python-dev ipython
 # Instalacion de libreria de python para bluetooth
 sudo pip install pybluez
-sudo sed -i -e 's/ExecStart=\/usr\/lib\/bluetooth\/bluetoothd/ExecStart=\/usr\/lib\/bluetooth\/bluetoothd -C/g' /etc/systemd/system/dbus-org.bluez.service
+sudo pip install wifi
+sudo sed -i -e 's/ExecStart=\/usr\/libexec\/bluetooth\/bluetoothd/ExecStart=\/usr\/libexec\/bluetooth\/bluetoothd -C/g' /etc/systemd/system/dbus-org.bluez.service
 # Agregar el perfil de bluetooth
 sudo sdptool add SP
 # Actualizar todos los paquetes instalados y reiniciar
