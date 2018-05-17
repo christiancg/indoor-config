@@ -35,7 +35,7 @@ sudo systemctl daemon-reload
 sudo apt-get install -y libbluetooth-dev bluez bluez-hcidump libboost-python-dev libboost-thread-dev libglib2.0-dev bluetooth libbluetooth-dev python-pip python-dev ipython
 # Instalacion de libreria de python para bluetooth
 sudo pip install wifi
-sudo sed -i -e 's/ExecStart=\/usr\/libexec\/bluetooth\/bluetoothd/ExecStart=\/usr\/libexec\/bluetooth\/bluetoothd -C/g' /etc/systemd/system/dbus-org.bluez.service
+sudo sed -i -e 's/ExecStart=\/usr\/libexec\/bluetooth\/bluetoothd/ExecStart=\/usr\/libexec\/bluetooth\/bluetoothd -C -E/g' /etc/systemd/system/dbus-org.bluez.service
 # Agregar el perfil de bluetooth
 sudo sdptool add SP
 # Actualizar todos los paquetes instalados y reiniciar
