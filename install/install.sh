@@ -4,7 +4,7 @@ touch /home/pi/indoor-config/db/indoor.db
 mkdir /home/pi/indoor-config/images
 # Se crea y escribe el archivo que establece el nombre del indoor
 sudo touch /etc/machine-info
-sudo echo "PRETTY_HOSTNAME=indoor-changeme" > /etc/machine-info
+echo "PRETTY_HOSTNAME=indoor-changeme" | sudo tee -a /etc/machine-info
 # Se descarga el repositorio que falta
 cd /home/pi
 git clone https://github.com/christiancg/indoor.git
