@@ -65,14 +65,18 @@ class Application(dbus.service.Object):
             chrcs = service.get_characteristics()
             for chrc in chrcs:
                 response[chrc.get_path()] = chrc.get_properties()
-                descs = chrc.get_descriptors()
-                for desc in descs:
-                    response[desc.get_path()] = desc.get_properties()
+                #~ descs = chrc.get_descriptors()
+                #~ for desc in descs:
+                    #~ response[desc.get_path()] = desc.get_properties()
 
         return response
         
 	def __del__(self):
 		self.remove_from_connection()
+		
+	@dbus.service.signal(DBUS_PROP_IFACE, signature='sa{sv}as')
+	def PropertiesChanged(self, interface, changed, invalidated):
+		print('dajhdhjasdhjkadasdas')
 
 
 class Service(dbus.service.Object):
@@ -144,26 +148,26 @@ class Characteristic(dbus.service.Object):
                         'Service': self.service.get_path(),
                         'UUID': self.uuid,
                         'Flags': self.flags,
-                        'Descriptors': dbus.Array(
-                                self.get_descriptor_paths(),
-                                signature='o')
+                        #~ 'Descriptors': dbus.Array(
+                                #~ self.get_descriptor_paths(),
+                                #~ signature='o')
                 }
         }
 
     def get_path(self):
         return dbus.ObjectPath(self.path)
 
-    def add_descriptor(self, descriptor):
-        self.descriptors.append(descriptor)
+    #~ def add_descriptor(self, descriptor):
+        #~ self.descriptors.append(descriptor)
 
-    def get_descriptor_paths(self):
-        result = []
-        for desc in self.descriptors:
-            result.append(desc.get_path())
-        return result
+    #~ def get_descriptor_paths(self):
+        #~ result = []
+        #~ for desc in self.descriptors:
+            #~ result.append(desc.get_path())
+        #~ return result
 
-    def get_descriptors(self):
-        return self.descriptors
+    #~ def get_descriptors(self):
+        #~ return self.descriptors
 
     @dbus.service.method(DBUS_PROP_IFACE,
                          in_signature='s',
@@ -200,52 +204,6 @@ class Characteristic(dbus.service.Object):
                          signature='sa{sv}as')
     def PropertiesChanged(self, interface, changed, invalidated):
         pass
-
-
-class Descriptor(dbus.service.Object):
-    """
-    org.bluez.GattDescriptor1 interface implementation
-    """
-    def __init__(self, bus, index, uuid, flags, characteristic):
-        self.path = characteristic.path + '/desc' + str(index)
-        self.bus = bus
-        self.uuid = uuid
-        self.flags = flags
-        self.chrc = characteristic
-        dbus.service.Object.__init__(self, bus, self.path)
-
-    def get_properties(self):
-        return {
-                GATT_DESC_IFACE: {
-                        'Characteristic': self.chrc.get_path(),
-                        'UUID': self.uuid,
-                        'Flags': self.flags,
-                }
-        }
-
-    def get_path(self):
-        return dbus.ObjectPath(self.path)
-
-    @dbus.service.method(DBUS_PROP_IFACE,
-                         in_signature='s',
-                         out_signature='a{sv}')
-    def GetAll(self, interface):
-        if interface != GATT_DESC_IFACE:
-            raise exceptions.InvalidArgsException()
-
-        return self.get_properties()[GATT_DESC_IFACE]
-
-    @dbus.service.method(GATT_DESC_IFACE,
-                        in_signature='a{sv}',
-                        out_signature='ay')
-    def ReadValue(self, options):
-        print('Default ReadValue called, returning error')
-        raise exceptions.NotSupportedException()
-
-    @dbus.service.method(GATT_DESC_IFACE, in_signature='aya{sv}')
-    def WriteValue(self, value, options):
-        print('Default WriteValue called, returning error')
-        raise exceptions.NotSupportedException()
 
 """
 
@@ -458,12 +416,14 @@ def register_app_error_cb(mainloop, error):
     print('Failed to register application: ' + str(error))
     mainloop.quit()
 
+def disconnect(adapter, device):
+	print('entro en disconnect')
 
 def gatt_server_main(mainloop, bus, adapter_name):
     adapter = adapters.find_adapter(bus, GATT_MANAGER_IFACE, adapter_name)
     if not adapter:
         raise Exception('GattManager1 interface not found')
-
+	
     service_manager = dbus.Interface(
             bus.get_object(BLUEZ_SERVICE_NAME, adapter),
             GATT_MANAGER_IFACE)
