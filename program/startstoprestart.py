@@ -15,6 +15,8 @@ class StartStopRestart:
 			return self._restartServer()
 		elif todo == 4:
 			return self._hardRestartServer()
+		elif todo == 5:
+			return self._disconnectFromBluetoothDevice()
 		else:
 			return self.BAD_REQUEST 
 
@@ -32,6 +34,10 @@ class StartStopRestart:
 		
 	def _hardRestartServer(self):
 		subprocess.call(['sudo', 'reboot'])
+		return self.OK
+		
+	def _disconnectFromBluetoothDevice(self):
+		subprocess.call(['sudo', 'echo', '-e', '"', 'remove', '*', '"', '|', 'bluetoothctl'])
 		return self.OK
 
 	def isServiceRunning(self):
