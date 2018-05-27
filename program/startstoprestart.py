@@ -37,8 +37,7 @@ class StartStopRestart:
 		return self.OK
 		
 	def _disconnectFromBluetoothDevice(self):
-		p = subprocess.Popen(['sudo echo -e devices | bluetoothctl'], shell=True, stdout=subprocess.PIPE)
-		#~ p = subprocess.Popen(['sudo echo -e devices | bluetoothctl'], stdout=subprocess.PIPE)
+		p = subprocess.Popen('sudo echo -e devices | bluetoothctl', shell=True, stdout=subprocess.PIPE)
 		output, error = p.communicate()
 		if error == None:
 			print(output)
