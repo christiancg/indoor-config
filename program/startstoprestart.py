@@ -37,7 +37,25 @@ class StartStopRestart:
 		return self.OK
 		
 	def _disconnectFromBluetoothDevice(self):
-		subprocess.call(['sudo', 'echo', '-e', '"', 'remove', '*', '"', '|', 'bluetoothctl'])
+		p = subprocess.Popen(['sudo echo -e devices | bluetoothctl'], shell=True, stdout=subprocess.PIPE)
+		#~ p = subprocess.Popen(['sudo echo -e devices | bluetoothctl'], stdout=subprocess.PIPE)
+		output, error = p.communicate()
+		if error == None:
+			print(output)
+			devices = []
+			for item in output.split("\n"):
+				if "Device" in item:
+					try:
+						idxStart = item.index(" ")
+					except ValueError:
+						idxStart = -1
+					if idxStart > 0:
+						idxStart = idxStart + 1
+						idxEnd = item.index(' ',idxStart)
+						aux_device = item[idxStart:idxEnd]
+						devices.append(aux_device)
+			for device in devices:
+				subprocess.call('sudo echo -e "remove ' + device + '" | bluetoothctl', shell=True)
 		return self.OK
 
 	def isServiceRunning(self):
