@@ -25,9 +25,9 @@ sudo pip install pygame
 # Actualizacion del driver bluetooth para que ande biene indoor-config
 sudo apt-get install -y libglib2.0-dev libdbus-1-dev libudev-dev libical-dev libreadline6 libreadline6-dev
 cd /tmp
-wget http://www.kernel.org/pub/linux/bluetooth/bluez-5.49.tar.xz
-tar xf bluez-5.49.tar.xz
-cd bluez-5.49
+wget http://www.kernel.org/pub/linux/bluetooth/bluez-5.50.tar.xz
+tar xf bluez-5.50.tar.xz
+cd bluez-5.50
 ./configure --prefix=/usr --mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var
 make
 sudo make install
